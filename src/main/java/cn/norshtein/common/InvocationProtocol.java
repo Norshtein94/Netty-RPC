@@ -15,4 +15,5 @@ public class InvocationProtocol implements Serializable {
     private String methodName;
     private Class<?>[] params;
     private Object[] values;
+    private Class<?> returnType;
 }

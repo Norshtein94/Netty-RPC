@@ -12,5 +12,6 @@ public class ClientTest {
         IRpcHelloService helloService = ProxyFactory.create(IRpcHelloService.class);
         helloService.sayHello();
         System.out.println(helloService.getName());
+        System.out.println(helloService.getUserInfo("Norshtein"));
     }
 }

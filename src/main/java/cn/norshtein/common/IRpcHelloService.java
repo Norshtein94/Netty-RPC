@@ -9,4 +9,6 @@ public interface IRpcHelloService {
     void sayHello();
 
     String getName();
+
+    UserInfo getUserInfo(String userName);
 }

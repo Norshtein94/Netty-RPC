@@ -1,8 +1,8 @@
 package cn.norshtein.client;
 
 import cn.norshtein.common.InvocationProtocol;
-import cn.norshtein.common.codec.MyObjectDecoder;
-import cn.norshtein.common.codec.MyObjectEncoder;
+import cn.norshtein.common.codec.MyJsonDecoder;
+import cn.norshtein.common.codec.MyJsonEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -89,8 +89,8 @@ public class RpcProxy implements InvocationHandler {
 //                pipeline.addLast("decoder", new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.cacheDisabled(null)));
 
                 // 使用自定义编、解码器
-                pipeline.addLast("encoder", new MyObjectEncoder());
-                pipeline.addLast("decoder", new MyObjectDecoder());
+                pipeline.addLast("encoder", new MyJsonEncoder());
+                pipeline.addLast("decoder", new MyJsonDecoder(protocol.getReturnType()));
                 pipeline.addLast("handler", clientHandler);
             }
         });

@@ -28,6 +28,7 @@ public class SimpleServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
+        cause.printStackTrace();
         System.out.println("occur exception");
     }
 

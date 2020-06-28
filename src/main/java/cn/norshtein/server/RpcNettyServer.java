@@ -1,9 +1,6 @@
 package cn.norshtein.server;
 
 import cn.norshtein.annotation.RpcService;
-import cn.norshtein.common.InvocationProtocol;
-import cn.norshtein.common.codec.MyJsonDecoder;
-import cn.norshtein.common.codec.MyJsonEncoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -13,6 +10,11 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -29,6 +31,7 @@ import java.util.Map;
 @Component
 public class RpcNettyServer implements ApplicationContextAware {
     private static final Map<String, Object> serviceMap = new HashMap<>(16);
+    private final SimpleServerHandler serverHandler = new SimpleServerHandler(serviceMap);
 
     public void start(int port) throws Exception {
         EventLoopGroup boss = new NioEventLoopGroup();
@@ -51,18 +54,18 @@ public class RpcNettyServer implements ApplicationContextAware {
                              lengthAdjustment：要添加到长度字段值的补偿值
                              initialBytesToStrip：从解码帧中去除的第一个字节数
                              */
-//                            pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
+                            pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
 //                            //自定义协议编码器
-//                            pipeline.addLast(new LengthFieldPrepender(4));
+                            pipeline.addLast(new LengthFieldPrepender(4));
 //                            //对象参数类型编码器
-//                            pipeline.addLast("encoder",new ObjectEncoder());
+                            pipeline.addLast("encoder",new ObjectEncoder());
 //                            //对象参数类型解码器
-//                            pipeline.addLast("decoder",new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.cacheDisabled(null)));
+                            pipeline.addLast("decoder",new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.cacheDisabled(null)));
 
                             //使用netty自带编解码器
-                            pipeline.addLast("encoder", new MyJsonEncoder());
-                            pipeline.addLast("decoder", new MyJsonDecoder(InvocationProtocol.class));
-                            pipeline.addLast(new SimpleServerHandler(serviceMap));
+//                            pipeline.addLast("encoder", new MyJsonEncoder());
+//                            pipeline.addLast("decoder", new MyJsonDecoder(InvocationProtocol.class));
+                            pipeline.addLast(serverHandler);
                         }
                     });
             ChannelFuture f = server.bind(port).sync();  //6

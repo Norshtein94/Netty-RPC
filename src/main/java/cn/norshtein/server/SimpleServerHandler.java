@@ -1,6 +1,7 @@
 package cn.norshtein.server;
 
 import cn.norshtein.common.InvocationProtocol;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
@@ -13,6 +14,7 @@ import java.util.Map;
  * @Date: 2020/6/1
  * @Desc:
  */
+@ChannelHandler.Sharable
 public class SimpleServerHandler extends ChannelInboundHandlerAdapter {
     private Map<String, Object> serviceMap = new HashMap<>(16);
 

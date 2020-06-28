@@ -1,8 +1,6 @@
 package cn.norshtein.client;
 
 import cn.norshtein.common.InvocationProtocol;
-import cn.norshtein.common.codec.MyJsonDecoder;
-import cn.norshtein.common.codec.MyJsonEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -11,6 +9,11 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -24,6 +27,7 @@ import java.net.Socket;
  * @Desc:
  */
 public class RpcProxy implements InvocationHandler {
+    private final SimpleClientHandler clientHandler = new SimpleClientHandler();
     private Class<?> clazz;
 
     public RpcProxy(Class<?> clazz) {
@@ -59,7 +63,7 @@ public class RpcProxy implements InvocationHandler {
     }
 
     private Object rpcNettyInvoke(InvocationProtocol protocol) throws Exception {
-        final SimpleClientHandler clientHandler = new SimpleClientHandler();
+//        final SimpleClientHandler clientHandler = new SimpleClientHandler();
         Bootstrap client = new Bootstrap();
         //第1步 定义线程组，处理读写和链接事件，没有了accept事件
         EventLoopGroup group = new NioEventLoopGroup();
@@ -80,17 +84,17 @@ public class RpcProxy implements InvocationHandler {
                  lengthAdjustment：要添加到长度字段值的补偿值
                  initialBytesToStrip：从解码帧中去除的第一个字节数
                  */
-//                pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
+                pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
 //                //自定义协议编码器
-//                pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
+                pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
 //                //对象参数类型编码器
-//                pipeline.addLast("encoder", new ObjectEncoder());
+                pipeline.addLast("encoder", new ObjectEncoder());
 //                //对象参数类型解码器
-//                pipeline.addLast("decoder", new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.cacheDisabled(null)));
+                pipeline.addLast("decoder", new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.cacheDisabled(null)));
 
                 // 使用自定义编、解码器
-                pipeline.addLast("encoder", new MyJsonEncoder());
-                pipeline.addLast("decoder", new MyJsonDecoder(protocol.getReturnType()));
+//                pipeline.addLast("encoder", new MyJsonEncoder());
+//                pipeline.addLast("decoder", new MyJsonDecoder(protocol.getReturnType()));
                 pipeline.addLast("handler", clientHandler);
             }
         });

@@ -10,8 +10,10 @@ import cn.norshtein.common.IRpcHelloService;
 public class ClientTest {
     public static void main(String[] args){
         IRpcHelloService helloService = ProxyFactory.create(IRpcHelloService.class);
-        helloService.sayHello();
-        System.out.println(helloService.getName());
-        System.out.println(helloService.getUserInfo("Norshtein"));
+        for (int i = 0; i < 10; i++) {
+            helloService.sayHello();
+            System.out.println(helloService.getName());
+            System.out.println(helloService.getUserInfo("Norshtein" + i));
+        }
     }
 }
